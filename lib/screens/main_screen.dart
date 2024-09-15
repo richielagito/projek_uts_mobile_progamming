@@ -1,35 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:projek_uts_mobile_progamming/screens/home_screen.dart';
+import 'package:projek_uts_mobile_progamming/screens/profile_screen.dart';
+import 'package:projek_uts_mobile_progamming/screens/search_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainScreen> createState() => MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
   static List<Widget> listOptions = <Widget>[
-    const Text(
-      'Home Screen',
-      style: TextStyle(color: Colors.white),
-    ),
-    const Text(
-      'Search Screen',
-      style: TextStyle(color: Colors.white),
-    ),
-    const Text(
-      'Profile Screen',
-      style: TextStyle(color: Colors.white),
-    ),
-    const Text(
-      'Notifications Screen',
-      style: TextStyle(color: Colors.white),
-    ),
-    const Text(
-      'Mail Screen',
-      style: TextStyle(color: Colors.white),
-    ),
+    const HomeScreen(),
+    const SearchScreen(),
+    const ProfileScreen(),
+
+    // HomeScreen(),
   ];
 
   void onItemTapped(int index) {
@@ -41,7 +29,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: listOptions.elementAt(selectedIndex),
@@ -54,16 +41,17 @@ class _MainScreenState extends State<MainScreen> {
               icon: Icon(Icons.search_outlined),
               label: '',
               backgroundColor: Colors.black),
+
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.notifications_outlined),
+          //     label: '',
+          //     backgroundColor: Colors.black),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.mail_outlined),
+          //     label: '',
+          //     backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.person_2_outlined),
-              label: '',
-              backgroundColor: Colors.black),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_outlined),
-              label: '',
-              backgroundColor: Colors.black),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.mail_outlined),
               label: '',
               backgroundColor: Colors.black),
         ],
@@ -75,6 +63,6 @@ class _MainScreenState extends State<MainScreen> {
         selectedItemColor: Colors.white,
         onTap: onItemTapped,
       ),
-    ));
+    );
   }
 }
