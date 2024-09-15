@@ -16,13 +16,12 @@ class MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const SearchScreen(),
     const ProfileScreen(),
-
-    // HomeScreen(),
   ];
 
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
+      print('Selected Index: $selectedIndex'); // Debugging
     });
   }
 
@@ -36,12 +35,13 @@ class MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.home), label: '', backgroundColor: Colors.black),
+              icon: Icon(Icons.home),
+              label: ' ',
+              backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.search_outlined),
-              label: '',
+              label: ' ',
               backgroundColor: Colors.black),
-
           // BottomNavigationBarItem(
           //     icon: Icon(Icons.notifications_outlined),
           //     label: '',
@@ -52,12 +52,12 @@ class MainScreenState extends State<MainScreen> {
           //     backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.person_2_outlined),
-              label: '',
+              label: ' ',
               backgroundColor: Colors.black),
         ],
         backgroundColor: Colors.black,
         unselectedItemColor: Colors.white,
-        showSelectedLabels: true,
+        showSelectedLabels: false, // Tidak tampilkan label
         iconSize: 30,
         currentIndex: selectedIndex,
         selectedItemColor: Colors.white,
