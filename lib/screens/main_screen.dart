@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projek_uts_mobile_progamming/screens/home_screen.dart';
+import 'package:projek_uts_mobile_progamming/screens/post_thread_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/profile_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/search_screen.dart';
 
@@ -15,6 +16,7 @@ class MainScreenState extends State<MainScreen> {
   static List<Widget> listOptions = <Widget>[
     const HomeScreen(),
     const SearchScreen(),
+    PostThreadScreen(),
     const ProfileScreen(),
   ];
 
@@ -46,10 +48,10 @@ class MainScreenState extends State<MainScreen> {
           //     icon: Icon(Icons.notifications_outlined),
           //     label: '',
           //     backgroundColor: Colors.black),
-          // BottomNavigationBarItem(
-          //     icon: Icon(Icons.mail_outlined),
-          //     label: '',
-          //     backgroundColor: Colors.black),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add_box_outlined),
+              label: '',
+              backgroundColor: Colors.black),
           BottomNavigationBarItem(
               icon: Icon(Icons.person_2_outlined),
               label: ' ',

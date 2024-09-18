@@ -89,7 +89,8 @@ class RegisterScreen extends StatelessWidget {
                   fillColor: Colors.grey.shade700,
                   prefixIconColor: Colors.white,
                   filled: true,
-                  constraints: const BoxConstraints.tightFor(width: 327, height: 50),
+                  constraints:
+                      const BoxConstraints.tightFor(width: 327, height: 50),
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Username',
                 ),
@@ -104,7 +105,8 @@ class RegisterScreen extends StatelessWidget {
                   fillColor: Colors.grey.shade700,
                   prefixIconColor: Colors.white,
                   filled: true,
-                  constraints: const BoxConstraints.tightFor(width: 327, height: 50),
+                  constraints:
+                      const BoxConstraints.tightFor(width: 327, height: 50),
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Password',
                 ),
@@ -119,7 +121,8 @@ class RegisterScreen extends StatelessWidget {
                   fillColor: Colors.grey.shade700,
                   prefixIconColor: Colors.white,
                   filled: true,
-                  constraints: const BoxConstraints.tightFor(width: 327, height: 50),
+                  constraints:
+                      const BoxConstraints.tightFor(width: 327, height: 50),
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Phone',
                 ),
@@ -134,7 +137,8 @@ class RegisterScreen extends StatelessWidget {
                   fillColor: Colors.grey.shade700,
                   prefixIconColor: Colors.white,
                   filled: true,
-                  constraints: const BoxConstraints.tightFor(width: 327, height: 50),
+                  constraints:
+                      const BoxConstraints.tightFor(width: 327, height: 50),
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Email',
                 ),
