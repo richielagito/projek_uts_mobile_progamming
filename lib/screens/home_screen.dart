@@ -29,3 +29,17 @@ class HomeScreen extends StatelessWidget {
         ));
   }
 }
+
+Widget _listItem(int index) {
+  return ListTile(
+      leading: CircleAvatar(backgroundImage: AssetImage("assets/profile.png")),
+      title: Text(
+        "Geda.Gedi",
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(
+        "Hello this is Geda gedi ",
+        overflow: TextOverflow.clip,
+        maxLines: 3,
+      ));
+}
