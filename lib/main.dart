@@ -4,6 +4,7 @@ import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/post_thread_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 // Import the generated file
 
 void main() async {
