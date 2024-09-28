@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -57,6 +58,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _listItem(int index, Map<String, String> tweet) {
+    var username = tweet['username'];
+    var tweetContent = tweet['tweet'];
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Card(
@@ -67,14 +71,14 @@ class HomeScreen extends StatelessWidget {
             radius: 30, // Profile size
           ),
           title: Text(
-            tweet['Geda.Gedi']!, //simulated username
+            username!,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
           subtitle: Text(
-            tweet['Hello, this is geda gedi']!,
+            tweetContent!,
             overflow: TextOverflow.clip,
             maxLines: 3,
             style: const TextStyle(color: Colors.white),
