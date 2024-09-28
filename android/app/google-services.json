@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059872485754",
+    "project_id": "projek-uts-mobile-progamming",
+    "storage_bucket": "projek-uts-mobile-progamming.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059872485754:android:42937cc06fef1ee8faa6c3",
+        "android_client_info": {
+          "package_name": "com.example.projek_uts_mobile_progaming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa6x_2ijIUWD-BH6YJUVz40i9MdMsbg_0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
