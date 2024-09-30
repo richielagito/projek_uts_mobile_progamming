@@ -1,9 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:projek_uts_mobile_progamming/screens/login_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  // Controller untuk field input
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+
+  // Fungsi untuk mendaftarkan pengguna
+  void daftar() async {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Mendaftarkan pengguna dengan email dan password di Firebase
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      // Setelah sukses, simpan data pengguna ke Firestore
+      await createUserInFirebase(
+        usernameController.text,
+        phoneController.text,
+        emailController.text,
+      );
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        // Navigasi ke MainScreen setelah pendaftaran sukses
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      displayMessage(e.code); // Menampilkan pesan error
+    }
+  }
+
+  // Fungsi untuk menyimpan data pengguna ke Firestore
+  Future<void> createUserInFirebase(
+      String username, String phone, String email) async {
+    await FirebaseFirestore.instance.collection('users').add({
+      'username': username,
+      'phone': phone,
+      'email': email,
+    });
+  }
+
+  // Fungsi untuk menampilkan pesan
+  void displayMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,23 +85,21 @@ class RegisterScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              const SizedBox(
-                height: 50,
-              ),
+              const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                      height: 60,
-                      width: 180,
-                      child: const Image(
-                        image: AssetImage('assets/images/img1.png'),
-                      )),
+                    height: 60,
+                    width: 180,
+                    child: const Image(
+                      image: AssetImage('assets/images/img1.png'),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
+              // Tombol login dengan Facebook
               Container(
                 width: 327,
                 height: 40,
@@ -42,21 +111,21 @@ class RegisterScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.facebook),
-                    SizedBox(
-                      width: 7,
-                    ),
+                    SizedBox(width: 7),
                     Center(
-                        child: Text(
-                      'Log in with Facebook',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    )),
+                      child: Text(
+                        'Log in with Facebook',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
+              // Garis pemisah OR
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -79,15 +148,15 @@ class RegisterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
+              // Input Username
               TextField(
+                controller: usernameController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11)),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
                   fillColor: Colors.grey.shade700,
-                  prefixIconColor: Colors.white,
                   filled: true,
                   constraints:
                       const BoxConstraints.tightFor(width: 327, height: 50),
@@ -95,15 +164,15 @@ class RegisterScreen extends StatelessWidget {
                   hintText: 'Username',
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
+              // Input Password
               TextField(
+                controller: passwordController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11)),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
                   fillColor: Colors.grey.shade700,
-                  prefixIconColor: Colors.white,
                   filled: true,
                   constraints:
                       const BoxConstraints.tightFor(width: 327, height: 50),
@@ -111,15 +180,15 @@ class RegisterScreen extends StatelessWidget {
                   hintText: 'Password',
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
+              // Input Phone
               TextField(
+                controller: phoneController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11)),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
                   fillColor: Colors.grey.shade700,
-                  prefixIconColor: Colors.white,
                   filled: true,
                   constraints:
                       const BoxConstraints.tightFor(width: 327, height: 50),
@@ -127,15 +196,15 @@ class RegisterScreen extends StatelessWidget {
                   hintText: 'Phone',
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
+              // Input Email
               TextField(
+                controller: emailController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11)),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
                   fillColor: Colors.grey.shade700,
-                  prefixIconColor: Colors.white,
                   filled: true,
                   constraints:
                       const BoxConstraints.tightFor(width: 327, height: 50),
@@ -143,17 +212,10 @@ class RegisterScreen extends StatelessWidget {
                   hintText: 'Email',
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
+              // Tombol Daftar
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const MainScreen(),
-                    ),
-                  );
-                },
+                onTap: daftar,
                 child: Container(
                   width: 327,
                   height: 50,
@@ -162,16 +224,17 @@ class RegisterScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: const Center(
-                      child: Text(
-                    'Register',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
+                    child: Text(
+                      'Register',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -181,9 +244,8 @@ class RegisterScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 120,
-              ),
+              const SizedBox(height: 120),
+              // Opsi login
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -202,7 +264,9 @@ class RegisterScreen extends StatelessWidget {
                     child: const Text(
                       " Log in",
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],

@@ -1,10 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:projek_uts_mobile_progamming/screens/home_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/register_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  // Fungsi untuk login pengguna
+  void login() async {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Autentikasi dengan Firebase menggunakan email dan password
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      // Jika login berhasil, ambil data pengguna dari Firestore
+      if (userCredential.user != null) {
+        User? user = userCredential.user;
+
+        // Ambil data pengguna dari Firestore berdasarkan email
+        DocumentSnapshot userData = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid) // Menggunakan UID dari user yang login
+            .get();
+
+        // Setelah data didapatkan, arahkan ke MainScreen
+        if (userData.exists) {
+          Navigator.pop(context); // Tutup dialog CircularProgressIndicator
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => MainScreen(
+                userData: userData.data(), // Kirim data pengguna ke MainScreen
+              ),
+            ),
+          );
+        } else {
+          Navigator.pop(context);
+          displayMessage("User data not found!");
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      displayMessage(e.message ?? "An error occurred.");
+    }
+  }
+
+  // Fungsi untuk menampilkan pesan error
+  void displayMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +106,7 @@ class LoginScreen extends StatelessWidget {
                     height: 15,
                   ),
                   TextField(
+                    controller: emailController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(11)),
@@ -55,6 +123,7 @@ class LoginScreen extends StatelessWidget {
                     height: 15,
                   ),
                   TextField(
+                    controller: passwordController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(11)),
@@ -71,13 +140,7 @@ class LoginScreen extends StatelessWidget {
                     height: 15,
                   ),
                   InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const MainScreen(),
-                        ),
-                      );
-                    },
+                    onTap: login, // Panggil fungsi login
                     child: Container(
                       width: 330,
                       height: 40,

@@ -5,7 +5,7 @@ import 'package:projek_uts_mobile_progamming/screens/profile_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/search_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, Object? userData});
 
   @override
   State<MainScreen> createState() => MainScreenState();
