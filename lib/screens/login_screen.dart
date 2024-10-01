@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(11)),
                       fillColor: Colors.grey.shade700,
-                      prefixIconColor: Colors.white,
+                      prefixIconColor: Colors.grey.shade700,
                       filled: true,
                       constraints:
                           const BoxConstraints.tightFor(width: 327, height: 50),
