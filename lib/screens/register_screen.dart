@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:projek_uts_mobile_progamming/screens/login_screen.dart';
-import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -12,13 +11,11 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // Controller untuk field input
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
 
-  // Fungsi untuk mendaftarkan pengguna
   void daftar() async {
     showDialog(
       context: context,
@@ -28,13 +25,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     try {
-      // Mendaftarkan pengguna dengan email dan password di Firebase
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      // Setelah sukses, simpan data pengguna ke Firestore
       await createUserInFirebase(
         usernameController.text,
         phoneController.text,
@@ -43,7 +38,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (context.mounted) {
         Navigator.pop(context);
-        // Navigasi ke MainScreen setelah pendaftaran sukses
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const LoginScreen(),
@@ -52,21 +46,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
-      displayMessage(e.code); // Menampilkan pesan error
+      displayMessage(e.code);
     }
   }
 
-  // Fungsi untuk menyimpan data pengguna ke Firestore
   Future<void> createUserInFirebase(
       String username, String phone, String email) async {
-    await FirebaseFirestore.instance.collection('users').add({
-      'username': username,
-      'phone': phone,
-      'email': email,
-    });
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'username': username,
+        'phone': phone,
+        'email': email,
+      });
+    }
   }
 
-  // Fungsi untuk menampilkan pesan
   void displayMessage(String message) {
     showDialog(
       context: context,

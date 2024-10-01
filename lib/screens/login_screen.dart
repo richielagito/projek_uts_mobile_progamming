@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       filled: true,
                       constraints:
                           const BoxConstraints.tightFor(width: 327, height: 50),
-                      hintStyle: const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: Colors.white),
                       hintText: 'Password',
                     ),
                   ),
