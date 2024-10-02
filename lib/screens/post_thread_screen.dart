@@ -1,13 +1,33 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
+import 'package:projek_uts_mobile_progamming/services/firestore_service.dart';
 
 class PostThreadScreen extends StatefulWidget {
+  const PostThreadScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _PostThreadScreenState createState() => _PostThreadScreenState();
 }
 
 class _PostThreadScreenState extends State<PostThreadScreen> {
   final TextEditingController _postController = TextEditingController();
+  final FirestoreService _firestoreService = FirestoreService();
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _getImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +37,7 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
         backgroundColor: Colors.black,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const MainScreen(),
-            ),
-          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text('New Thread', style: TextStyle(color: Colors.white)),
         actions: [
@@ -30,10 +46,24 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
                 const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: ElevatedButton(
               onPressed: _postController.text.isNotEmpty
-                  ? () {
-                      // Implementasi logika posting di sini
-                      print('Posting: ${_postController.text}');
-                      Navigator.of(context).pop();
+                  ? () async {
+                      final user = FirebaseAuth.instance.currentUser;
+                      if (user != null) {
+                        await _firestoreService.addThreadWithImage(
+                          _postController.text,
+                          user.uid,
+                          _image,
+                        );
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (context) => const MainScreen()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('You must be logged in to post.')),
+                        );
+                      }
                     }
                   : null,
               style: ElevatedButton.styleFrom(
@@ -68,24 +98,32 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
                 contentPadding: EdgeInsets.all(16),
               ),
               onChanged: (text) {
-                setState(() {}); // Memicu rebuild untuk mengupdate tombol Post
+                setState(() {});
               },
             ),
           ),
+          if (_image != null)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.file(_image!, height: 100),
+            ),
           Divider(height: 1, color: Colors.grey[800]),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                Icon(Icons.image, color: Colors.blue),
-                SizedBox(width: 16),
-                Icon(Icons.gif_box, color: Colors.blue),
-                SizedBox(width: 16),
-                Icon(Icons.list_alt, color: Colors.blue),
-                SizedBox(width: 16),
-                Icon(Icons.location_on, color: Colors.blue),
-                Spacer(),
-                Text('Everyone can reply',
+                IconButton(
+                  icon: const Icon(Icons.image, color: Colors.blue),
+                  onPressed: _getImage,
+                ),
+                const SizedBox(width: 16),
+                const Icon(Icons.gif_box, color: Colors.blue),
+                const SizedBox(width: 16),
+                const Icon(Icons.list_alt, color: Colors.blue),
+                const SizedBox(width: 16),
+                const Icon(Icons.location_on, color: Colors.blue),
+                const Spacer(),
+                const Text('Everyone can reply',
                     style: TextStyle(color: Colors.grey)),
               ],
             ),
