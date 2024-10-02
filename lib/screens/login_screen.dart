@@ -137,6 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintStyle: const TextStyle(color: Colors.white),
                       hintText: 'Password',
                     ),
+                    style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(
                     height: 15,
