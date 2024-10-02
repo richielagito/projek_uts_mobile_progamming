@@ -23,6 +23,7 @@ class MainScreenState extends State<MainScreen> {
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
+      // ignore: avoid_print
       print('Selected Index: $selectedIndex'); // Debugging
     });
   }

@@ -158,6 +158,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Username',
                 ),
+                style: const TextStyle(
+                    color: Colors.white), // Warna teks input putih
               ),
               const SizedBox(height: 15),
               // Input Password
@@ -174,6 +176,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Password',
                 ),
+                style: const TextStyle(
+                    color: Colors.white), // Warna teks input putih
               ),
               const SizedBox(height: 15),
               // Input Phone
@@ -190,6 +194,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Phone',
                 ),
+                style: const TextStyle(
+                    color: Colors.white), // Warna teks input putih
               ),
               const SizedBox(height: 15),
               // Input Email
@@ -206,6 +212,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Email',
                 ),
+                style: const TextStyle(
+                    color: Colors.white), // Warna teks input putih
               ),
               const SizedBox(height: 15),
               // Tombol Daftar
@@ -239,7 +247,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 120),
+              const SizedBox(height: 60),
               // Opsi login
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

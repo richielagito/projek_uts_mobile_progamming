@@ -115,9 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       filled: true,
                       constraints:
                           const BoxConstraints.tightFor(width: 327, height: 50),
-                      hintStyle: const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255)),
                       hintText: 'Phone number, email or username',
                     ),
+                    style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(
                     height: 15,
