@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -9,6 +10,37 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   bool _isSearching = false;
+  String searchQuery = "";
+  List<String> filteredUsernames = [];
+
+  // Real-time search of usernames in Firestore
+  Future<void> searchUsernames(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        filteredUsernames.clear();
+      });
+      return;
+    }
+
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isGreaterThanOrEqualTo: query)
+          .where('username',
+              isLessThanOrEqualTo:
+                  query + '\uf8ff') // for case-insensitive filtering
+          .get();
+
+      final userNamesList =
+          querySnapshot.docs.map((doc) => doc['username'].toString()).toList();
+
+      setState(() {
+        filteredUsernames = userNamesList;
+      });
+    } catch (e) {
+      print("Error searching usernames: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +81,12 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               child: TextField(
                 style: const TextStyle(color: Colors.white),
-                onTap: () {
+                onChanged: (value) {
                   setState(() {
+                    searchQuery = value;
                     _isSearching = true;
                   });
+                  searchUsernames(value); // Trigger real-time search
                 },
                 onEditingComplete: () {
                   setState(() {
@@ -73,7 +107,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                     borderSide: const BorderSide(
-                      color: Colors.blue, // Changed to blue
+                      color: Colors.blue,
                       width: 2.0,
                     ),
                   ),
@@ -81,41 +115,31 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
             const SizedBox(height: 30.0),
-            // Search Button with shadow effect
-            ElevatedButton(
-              onPressed: () {
-                // Handle search button press
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Changed to blue
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16.0, horizontal: 60.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                elevation: 12,
-                shadowColor: Colors.blueAccent, // Changed to blueAccent
-              ),
-              child: const Text(
-                'Search',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 30.0),
-            // A little fading message or instruction
-            AnimatedOpacity(
-              opacity: _isSearching ? 0.0 : 1.0,
-              duration: const Duration(milliseconds: 500),
-              child: const Text(
-                'Type something to search...',
-                style: TextStyle(
-                  color: Colors.white38,
-                  fontSize: 16.0,
-                ),
-              ),
+            // Display filtered usernames
+            Expanded(
+              child: filteredUsernames.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: filteredUsernames.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                            filteredUsernames[index],
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        searchQuery.isEmpty
+                            ? 'Start typing to search...'
+                            : 'No users found',
+                        style: const TextStyle(
+                          color: Colors.white38,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),
