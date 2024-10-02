@@ -63,13 +63,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void displayMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(message),
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
       ),
-    );
-  }
+      backgroundColor: Colors.black,
+      title: Text(
+        message == "email-already-in-use"
+            ? "Email sudah digunakan, silakan gunakan email lain."
+            : message == "weak-password"
+            ? "Password terlalu lemah."
+            : message,
+        style: TextStyle(color: Colors.white),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'OK',
+            style: TextStyle(color: Colors.blue),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
