@@ -9,20 +9,63 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black, // Black background for dark mode
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              height: 150,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage('https://via.placeholder.com/500x150'),
-                  fit: BoxFit.cover,
+            Stack(
+              clipBehavior: Clip.none, // This allows the avatar to overflow
+              children: [
+                // Cover image
+                Container(
+                  height: 150,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(
+                          'https://via.placeholder.com/500x150'), // Replace with actual cover image URL
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              ),
+                // Positioned profile image to overlap with the cover image and bio
+                Positioned(
+                  top: 100, // Adjust this value to move the avatar up or down
+                  left: 16, // Adjust for avatar's horizontal position
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: NetworkImage(
+                        'https://via.placeholder.com/100'), // Replace with actual profile image URL
+                  ),
+                ),
+                // Positioned Edit Profile button on the top-right corner
+                Positioned(
+                    top: 1200, // Adjust for vertical positioning
+                    right: 16, // Adjust for horizontal positioning
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                            250, 176, 88, 238), // Button color
+                        padding: const EdgeInsets.all(20), // Increase hit area
+                      ),
+                      onPressed: () {
+                        print("Edit Profile button pressed");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileEditScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Edit Profile',
+                        style: TextStyle(color: Colors.white), // Text color
+                      ),
+                    )),
+              ],
             ),
-            const SizedBox(height: 20),
-            const UserInfo(),
+            const SizedBox(
+                height: 60), // To compensate for the overlap of the avatar
+            const UserInfo(), // Your user info content below
           ],
         ),
       ),
@@ -39,7 +82,6 @@ class UserInfo extends StatefulWidget {
 
 class _UserInfoState extends State<UserInfo> {
   String username = 'Loading...';
-  String name = 'Loading...';
   String location = 'Loading...'; // Assuming you'll fetch this too
   String website = 'Loading...'; // Assuming you'll fetch this too
 
@@ -103,16 +145,13 @@ class _UserInfoState extends State<UserInfo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: NetworkImage('https://via.placeholder.com/100'),
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Text(
             username,
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
+              color: Colors.white, // White text for dark mode
             ),
           ),
           const SizedBox(height: 8),
@@ -120,9 +159,12 @@ class _UserInfoState extends State<UserInfo> {
             children: [
               const Icon(Icons.location_on, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text(location,
-                  style: const TextStyle(
-                      color: Colors.grey)), // Displaying the location
+              Text(
+                location,
+                style: const TextStyle(
+                  color: Colors.grey, // Grey text for location
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -133,22 +175,10 @@ class _UserInfoState extends State<UserInfo> {
               Text(
                 website,
                 style: const TextStyle(
-                  color: Color.fromARGB(255, 34, 38, 243),
+                  color: Color.fromRGBO(176, 101, 255, 1), // Blue for links
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileEditScreen(),
-                ),
-              );
-            },
-            child: const Text('Edit Profile'),
           ),
         ],
       ),
