@@ -1,11 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projek_uts_mobile_progamming/screens/post_thread_screen.dart';
+// ignore: unused_import
 import 'package:projek_uts_mobile_progamming/models/thread_model.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class HomeScreen extends StatelessWidget {
+class Thread {
+  String id;
+  String userId;
+  String content;
+  DateTime createdAt;
+  String? imageUrl;
+  int likes;
+  int retweets;
+  List<String> likedBy;
+  List<String> retweetedBy;
+
+  Thread({
+    required this.id,
+    required this.userId,
+    required this.content,
+    required this.createdAt,
+    this.imageUrl,
+    required this.likes, // Tambahkan ini
+    required this.retweets, // Tambahkan ini
+    this.likedBy = const [],
+    this.retweetedBy = const [],
+  });
+
+  factory Thread.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map<String, dynamic>;
+    return Thread(
+      id: doc.id,
+      userId: data['userId'] ?? '',
+      content: data['content'] ?? '',
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      imageUrl: data['imageUrl'],
+      likes: (data['likes'] is int) ? data['likes'] : 0, // Handle type mismatch
+      retweets: (data['retweets'] is int) ? data['retweets'] : 0,
+      likedBy: List<String>.from(data['likedBy'] ?? []),
+      retweetedBy:
+          List<String>.from(data['retweetedBy'] ?? []), // Handle type mismatch
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final currentUser = FirebaseAuth.instance.currentUser;
 
   Future<String> getUsername(String userId) async {
     try {
@@ -22,6 +71,75 @@ class HomeScreen extends StatelessWidget {
 
   String formatTimestamp(DateTime timestamp) {
     return DateFormat('dd MMMM yyyy, HH:mm').format(timestamp);
+  }
+
+  Future<void> _handleLike(Thread thread) async {
+    if (currentUser == null) return;
+
+    if (thread.likedBy.contains(currentUser!.uid)) {
+      // Unlike the post
+      setState(() {
+        thread.likes -= 1;
+        thread.likedBy.remove(currentUser!.uid);
+      });
+
+      await FirebaseFirestore.instance
+          .collection('threads')
+          .doc(thread.id)
+          .update({
+        'likes': thread.likes,
+        'likedBy': FieldValue.arrayRemove([currentUser!.uid]), // Remove user ID
+      });
+    } else {
+      // Like the post
+      setState(() {
+        thread.likes += 1;
+        thread.likedBy.add(currentUser!.uid);
+      });
+
+      await FirebaseFirestore.instance
+          .collection('threads')
+          .doc(thread.id)
+          .update({
+        'likes': thread.likes,
+        'likedBy': FieldValue.arrayUnion([currentUser!.uid]), // Add user ID
+      });
+    }
+  }
+
+  Future<void> _handleRetweet(Thread thread) async {
+    if (currentUser == null) return;
+
+    if (thread.retweetedBy.contains(currentUser!.uid)) {
+      // Unretweet the post
+      setState(() {
+        thread.retweets -= 1;
+        thread.retweetedBy.remove(currentUser!.uid);
+      });
+
+      await FirebaseFirestore.instance
+          .collection('threads')
+          .doc(thread.id)
+          .update({
+        'retweets': thread.retweets,
+        'retweetedBy':
+            FieldValue.arrayRemove([currentUser!.uid]), // Remove user ID
+      });
+    } else {
+      // Retweet the post
+      setState(() {
+        thread.retweets += 1;
+        thread.retweetedBy.add(currentUser!.uid);
+      });
+
+      await FirebaseFirestore.instance
+          .collection('threads')
+          .doc(thread.id)
+          .update({
+        'retweets': thread.retweets,
+        'retweetedBy': FieldValue.arrayUnion([currentUser!.uid]), // Add user ID
+      });
+    }
   }
 
   @override
@@ -148,6 +266,46 @@ class HomeScreen extends StatelessWidget {
                 formatTimestamp(thread.createdAt),
                 style: TextStyle(color: Colors.grey),
               ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                //tombol untuk like
+                IconButton(
+                  icon: Icon(
+                    Icons.favorite,
+                    color: thread.likes > 0 ? Colors.red : Colors.white,
+                  ),
+                  onPressed: () async {
+                    await _handleLike(
+                        thread); // Call the existing _handleLike method
+                  },
+                ),
+                Text(
+                  '${thread.likes} Likes',
+                  style: TextStyle(color: Colors.white),
+                ),
+
+                // Tombol untuk Retweet
+                IconButton(
+                  icon: Icon(
+                    Icons.repeat,
+                    color: thread.retweets > 0 ? Colors.green : Colors.white,
+                  ),
+                  onPressed: () async {
+                    await _handleRetweet(
+                        thread); // Call the async function properly
+                  },
+                ),
+                Text(
+                  '${thread.retweets} Retweets',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  '${thread.retweets} Retweets',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
             ),
           ],
         ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:projek_uts_mobile_progamming/screens/login_screen.dart';
+// ignore: unused_import
 import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
+// ignore: unused_import
 import 'package:projek_uts_mobile_progamming/screens/post_thread_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+// ignore: unused_import
 import 'package:firebase_auth/firebase_auth.dart';
 // Import the generated file
 

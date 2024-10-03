@@ -14,7 +14,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  bool _isPasswordVisible = false; // Tambahkan variabel untuk kontrol visibilitas password
+  bool _isPasswordVisible =
+      false; // Tambahkan variabel untuk kontrol visibilitas password
 
   // Fungsi untuk login pengguna
   void login() async {
@@ -46,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Setelah data didapatkan, arahkan ke MainScreen
         if (userData.exists) {
           Navigator.pop(context); // Tutup dialog CircularProgressIndicator
-          Navigator.of(context).pushReplacement(
+          Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => MainScreen(
                 userData: userData.data(), // Kirim data pengguna ke MainScreen
@@ -74,7 +75,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         backgroundColor: Colors.black,
         title: Text(
-          message == "The supplied auth credential is incorrect, malformed or has expired."
+          message ==
+                  "The supplied auth credential is incorrect, malformed or has expired."
               ? "Email atau kata sandi anda masukkan salah,silahkan coba lagi."
               : message,
           style: TextStyle(color: Colors.white),
@@ -98,12 +100,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center( // Tambahkan Center untuk memastikan elemen-elemen berada di tengah
+      body: Center(
+        // Tambahkan Center untuk memastikan elemen-elemen berada di tengah
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 100), // Beri jarak vertikal yang lebih besar
+              const SizedBox(
+                  height: 100), // Beri jarak vertikal yang lebih besar
               Container(
                 height: 100, // Perbesar tinggi gambar
                 width: 200, // Perbesar lebar gambar
@@ -122,7 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   constraints:
                       const BoxConstraints.tightFor(width: 327, height: 50),
                   hintStyle: const TextStyle(
-                      color: Colors.grey), // Ubah warna hint text menjadi abu-abu
+                      color:
+                          Colors.grey), // Ubah warna hint text menjadi abu-abu
                   hintText: 'Email',
                 ),
                 style: const TextStyle(color: Colors.white),
@@ -130,7 +135,8 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 15),
               TextField(
                 controller: passwordController,
-                obscureText: !_isPasswordVisible, // Mengatur visibilitas password
+                obscureText:
+                    !_isPasswordVisible, // Mengatur visibilitas password
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(11)),
@@ -138,7 +144,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   filled: true,
                   constraints:
                       const BoxConstraints.tightFor(width: 327, height: 50),
-                  hintStyle: const TextStyle(color: Colors.grey), // Ubah warna hint text menjadi abu-abu
+                  hintStyle: const TextStyle(
+                      color:
+                          Colors.grey), // Ubah warna hint text menjadi abu-abu
                   hintText: 'Kata sandi',
                   suffixIcon: IconButton(
                     icon: Icon(
