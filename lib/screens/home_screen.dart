@@ -16,6 +16,7 @@ class Thread {
   int retweets;
   List<String> likedBy;
   List<String> retweetedBy;
+  List<Map<String, dynamic>> comments;
 
   Thread({
     required this.id,
@@ -23,10 +24,11 @@ class Thread {
     required this.content,
     required this.createdAt,
     this.imageUrl,
-    required this.likes, // Tambahkan ini
-    required this.retweets, // Tambahkan ini
+    required this.likes,
+    required this.retweets,
     this.likedBy = const [],
     this.retweetedBy = const [],
+    this.comments = const [],
   });
 
   factory Thread.fromFirestore(DocumentSnapshot doc) {
@@ -37,11 +39,11 @@ class Thread {
       content: data['content'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       imageUrl: data['imageUrl'],
-      likes: (data['likes'] is int) ? data['likes'] : 0, // Handle type mismatch
+      likes: (data['likes'] is int) ? data['likes'] : 0,
       retweets: (data['retweets'] is int) ? data['retweets'] : 0,
       likedBy: List<String>.from(data['likedBy'] ?? []),
-      retweetedBy:
-          List<String>.from(data['retweetedBy'] ?? []), // Handle type mismatch
+      retweetedBy: List<String>.from(data['retweetedBy'] ?? []),
+      comments: List<Map<String, dynamic>>.from(data['comments'] ?? []),
     );
   }
 }
@@ -107,6 +109,26 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _handleComment(Thread thread, String commentContent) async {
+    if (currentUser == null || commentContent.isEmpty) return;
+
+    final comment = {
+      'userId': currentUser!.uid,
+      'comment': commentContent,
+    };
+
+    setState(() {
+      thread.comments.add(comment);
+    });
+
+    await FirebaseFirestore.instance
+        .collection('threads')
+        .doc(thread.id)
+        .update({
+      'comments': FieldValue.arrayUnion([comment]),
+    });
+  }
+
   Future<void> _handleRetweet(Thread thread) async {
     if (currentUser == null) return;
 
@@ -140,6 +162,87 @@ class _HomeScreenState extends State<HomeScreen> {
         'retweetedBy': FieldValue.arrayUnion([currentUser!.uid]), // Add user ID
       });
     }
+  }
+
+  void _showCommentDialog(Thread thread) {
+    String commentContent = '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add a Comment'),
+          content: TextField(
+            onChanged: (value) {
+              commentContent = value;
+            },
+            decoration:
+                const InputDecoration(hintText: "Type your comment here"),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Post'),
+              onPressed: () async {
+                await _handleComment(thread, commentContent);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAllCommentsDialog(BuildContext context, Thread thread) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Semua Komentar'),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: thread.comments.length,
+              itemBuilder: (context, index) {
+                var comment = thread.comments[index];
+                return FutureBuilder<String>(
+                  future: getUsername(comment['userId']),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    String username = snapshot.data ?? 'Unknown User';
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: AssetImage('assets/profile.png'),
+                      ),
+                      title: Text(username,
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(comment['comment']),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -209,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ));
         },
         backgroundColor: Colors.blue,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -217,13 +320,28 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _listItem(Thread thread, String username) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Card(
-        color: Colors.black,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 56, 54, 54),
+          border: Border.all(
+            color: Colors.grey.shade700,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(2, 2),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              leading: CircleAvatar(
+              leading: const CircleAvatar(
                 backgroundImage: AssetImage('assets/profile.png'),
                 radius: 30,
               ),
@@ -261,52 +379,137 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                formatTimestamp(thread.createdAt),
-                style: TextStyle(color: Colors.grey),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, top: 4.0, bottom: 8.0),
+                    child: Text(
+                      formatTimestamp(thread.createdAt),
+                      style: const TextStyle(
+                        fontSize: 12.0,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          thread.likedBy.contains(currentUser?.uid)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: thread.likedBy.contains(currentUser?.uid)
+                              ? Colors.red
+                              : Colors.white,
+                        ),
+                        onPressed: () => _handleLike(thread),
+                      ),
+                      Text(
+                        '${thread.likes}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        icon: const Icon(Icons.mode_comment_outlined,
+                            color: Colors.white),
+                        onPressed: () => _showCommentDialog(thread),
+                      ),
+                      Text(
+                        '${thread.comments.length}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        icon: Icon(
+                          thread.retweetedBy.contains(currentUser?.uid)
+                              ? Icons.repeat
+                              : Icons.repeat_outlined,
+                          color: thread.retweetedBy.contains(currentUser?.uid)
+                              ? Colors.green
+                              : Colors.white,
+                        ),
+                        onPressed: () => _handleRetweet(thread),
+                      ),
+                      Text(
+                        '${thread.retweets}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                //tombol untuk like
-                IconButton(
-                  icon: Icon(
-                    Icons.favorite,
-                    color: thread.likes > 0 ? Colors.red : Colors.white,
-                  ),
-                  onPressed: () async {
-                    await _handleLike(
-                        thread); // Call the existing _handleLike method
-                  },
+            // Bagian Komentar ala Instagram
+            if (thread.comments.isNotEmpty)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _showAllCommentsDialog(context, thread),
+                      child: Text(
+                        'Lihat semua ${thread.comments.length} komentar',
+                        style: const TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                    // Tampilkan maksimal 2 komentar
+                    ...thread.comments.take(2).map((comment) {
+                      return FutureBuilder<String>(
+                        future: getUsername(comment['userId']!),
+                        builder: (context, usernameSnapshot) {
+                          if (usernameSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const SizedBox(); // Placeholder kosong
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Foto profil kecil di samping kiri
+                                const CircleAvatar(
+                                  radius: 15,
+                                  backgroundImage:
+                                      AssetImage('assets/profile.png'),
+                                ),
+                                const SizedBox(width: 8),
+                                // Teks username dan komentar
+                                Expanded(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '${usernameSnapshot.data} ',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: comment['comment'] ?? '',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ],
                 ),
-                Text(
-                  '${thread.likes} Likes',
-                  style: TextStyle(color: Colors.white),
-                ),
-
-                // Tombol untuk Retweet
-                IconButton(
-                  icon: Icon(
-                    Icons.repeat,
-                    color: thread.retweets > 0 ? Colors.green : Colors.white,
-                  ),
-                  onPressed: () async {
-                    await _handleRetweet(
-                        thread); // Call the async function properly
-                  },
-                ),
-                Text(
-                  '${thread.retweets} Retweets',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Text(
-                  '${thread.retweets} Retweets',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
+              ),
           ],
         ),
       ),
