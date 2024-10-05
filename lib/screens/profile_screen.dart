@@ -3,16 +3,66 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'profile_edit.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String username = 'Profil';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          username =
+              (userDoc.data() as Map<String, dynamic>)['username'] ?? 'Profil';
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Text(
+          username,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            color: Colors.white,
+            fontFamily: 'Poppins',
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushReplacementNamed('/login');
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // Align to the left
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               clipBehavior: Clip.none,
@@ -143,28 +193,30 @@ class _UserInfoState extends State<UserInfo> {
             .get();
 
         if (userDoc.exists) {
+          Map<String, dynamic> userData =
+              userDoc.data() as Map<String, dynamic>;
           setState(() {
-            username = userDoc['username'] ?? '@unknown';
-            bio = userDoc['bio'] ?? 'No bio available';
+            username = userData['username'] ?? '@tidak dikenal';
+            bio = userData['bio'] ?? 'Belum ada bio';
           });
         } else {
           setState(() {
-            username = 'No user found';
-            bio = 'No bio available';
+            username = 'Pengguna tidak ditemukan';
+            bio = 'Belum ada bio';
           });
         }
       } else {
         setState(() {
-          username = 'User not logged in';
-          bio = 'No bio available';
+          username = 'Pengguna belum masuk';
+          bio = 'Belum ada bio';
         });
       }
     } catch (e) {
+      print('Error mengambil data pengguna: $e');
       setState(() {
-        username = 'Error loading username';
-        bio = 'Error loading bio';
+        username = 'Gagal memuat username';
+        bio = 'Gagal memuat bio';
       });
-      print('Error fetching user data: $e');
     }
   }
 

@@ -19,6 +19,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   final _usernameController = TextEditingController();
   final _bioController = TextEditingController();
 
+  bool isPicking = false; // Flag to check if picker is already active
+
   @override
   void initState() {
     super.initState();
@@ -37,29 +39,43 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   Future<void> _loadCurrentUserData() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.uid)
-          .get();
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
 
-      if (userDoc.exists) {
-        setState(() {
-          profilePictureUrl = userDoc['profile_picture'] ??
-              'https://via.placeholder.com/100'; // Default profile image
-          coverPhotoUrl = userDoc['cover_photo'] ??
-              'https://via.placeholder.com/500x150'; // Default cover image
-          _nameController.text = userDoc['name'] ?? '';
-          _usernameController.text = userDoc['username'] ?? '';
-          _bioController.text = userDoc['bio'] ?? '';
-        });
+        if (userDoc.exists) {
+          setState(() {
+            profilePictureUrl = (userDoc.data()
+                    as Map<String, dynamic>)['profile_picture'] as String? ??
+                'https://via.placeholder.com/100'; // Default profile image
+            coverPhotoUrl = (userDoc.data()
+                    as Map<String, dynamic>)['cover_photo'] as String? ??
+                'https://via.placeholder.com/500x150'; // Default cover photo
+          });
+        }
+      } catch (e) {
+        print('Error loading user data: $e');
       }
     }
   }
 
   Future<void> uploadProfilePicture() async {
+    if (isPicking) return; // Prevent picker from being opened if already active
+    setState(() {
+      isPicking = true;
+    });
+
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image == null) return; // User canceled the picker
+
+    if (image == null) {
+      setState(() {
+        isPicking = false; // Reset flag if user cancels
+      });
+      return; // User canceled the picker
+    }
 
     // Get a reference to Firebase Storage
     final Reference storageRef =
@@ -84,13 +100,25 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
     setState(() {
       profilePictureUrl = downloadUrl; // Update local state with the URL
+      isPicking = false; // Reset flag
     });
   }
 
   Future<void> uploadCoverPhoto() async {
+    if (isPicking) return; // Prevent picker from being opened if already active
+    setState(() {
+      isPicking = true;
+    });
+
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image == null) return; // User canceled the picker
+
+    if (image == null) {
+      setState(() {
+        isPicking = false; // Reset flag if user cancels
+      });
+      return; // User canceled the picker
+    }
 
     // Get a reference to Firebase Storage
     final Reference storageRef =
@@ -115,6 +143,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
     setState(() {
       coverPhotoUrl = downloadUrl; // Update local state with the URL
+      isPicking = false; // Reset flag
     });
   }
 
@@ -125,13 +154,11 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         title: const Text('Edit Profile'),
       ),
       body: SingleChildScrollView(
-        // Wrap with SingleChildScrollView
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Cover Photo Upload Section
               GestureDetector(
                 onTap: uploadCoverPhoto,
                 child: Container(
@@ -151,7 +178,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Profile Picture Upload Section
               GestureDetector(
                 onTap: uploadProfilePicture,
                 child: CircleAvatar(
@@ -164,8 +190,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       : null,
                 ),
               ),
-              const SizedBox(height: 16),
-
               const SizedBox(height: 16),
               const Text('Username', style: TextStyle(fontSize: 18)),
               TextField(
@@ -182,7 +206,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  // Handle save action and store other profile data
                   User? currentUser = FirebaseAuth.instance.currentUser;
                   if (currentUser != null) {
                     FirebaseFirestore.instance
