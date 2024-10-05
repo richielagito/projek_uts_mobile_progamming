@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth for getting the current user
+import 'package:firebase_auth/firebase_auth.dart';
 import 'profile_edit.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -9,67 +9,109 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Black background for dark mode
+      backgroundColor: Colors.black,
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // Align to the left
           children: [
             Stack(
-              clipBehavior: Clip.none, // This allows the avatar to overflow
+              clipBehavior: Clip.none,
               children: [
-                // Cover image
-                Container(
-                  height: 150,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(
-                          'https://via.placeholder.com/500x150'), // Replace with actual cover image URL
-                      fit: BoxFit.cover,
+                FutureBuilder<String>(
+                  future: _getCoverImage(),
+                  builder: (context, snapshot) {
+                    return Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: snapshot.connectionState ==
+                                  ConnectionState.waiting
+                              ? const NetworkImage(
+                                  'https://via.placeholder.com/500x150')
+                              : snapshot.hasData && snapshot.data != null
+                                  ? NetworkImage(snapshot.data!)
+                                  : const NetworkImage(
+                                      'https://via.placeholder.com/500x150'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                Positioned(
+                  top: 100,
+                  left: 16,
+                  child: FutureBuilder<String>(
+                    future: _getProfileImage(),
+                    builder: (context, snapshot) {
+                      return CircleAvatar(
+                        radius: 40,
+                        backgroundImage:
+                            snapshot.connectionState == ConnectionState.waiting
+                                ? const NetworkImage(
+                                    'https://via.placeholder.com/100')
+                                : snapshot.hasData && snapshot.data != null
+                                    ? NetworkImage(snapshot.data!)
+                                    : const NetworkImage(
+                                        'https://via.placeholder.com/100'),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 120,
+                  right: 16,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(176, 88, 238, 0.98),
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileEditScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Edit Profile',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
-                // Positioned profile image to overlap with the cover image and bio
-                Positioned(
-                  top: 100, // Adjust this value to move the avatar up or down
-                  left: 16, // Adjust for avatar's horizontal position
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundImage: NetworkImage(
-                        'https://via.placeholder.com/100'), // Replace with actual profile image URL
-                  ),
-                ),
-                // Positioned Edit Profile button on the top-right corner
-                Positioned(
-                    top: 1200, // Adjust for vertical positioning
-                    right: 16, // Adjust for horizontal positioning
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                            250, 176, 88, 238), // Button color
-                        padding: const EdgeInsets.all(20), // Increase hit area
-                      ),
-                      onPressed: () {
-                        print("Edit Profile button pressed");
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProfileEditScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'Edit Profile',
-                        style: TextStyle(color: Colors.white), // Text color
-                      ),
-                    )),
               ],
             ),
-            const SizedBox(
-                height: 60), // To compensate for the overlap of the avatar
-            const UserInfo(), // Your user info content below
+            const SizedBox(height: 60),
+            const UserInfo(),
           ],
         ),
       ),
     );
+  }
+
+  Future<String> _getCoverImage() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+      return userDoc['cover_photo'] ?? 'https://via.placeholder.com/500x150';
+    }
+    return 'https://via.placeholder.com/500x150';
+  }
+
+  Future<String> _getProfileImage() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+      return userDoc['profile_picture'] ?? 'https://via.placeholder.com/100';
+    }
+    return 'https://via.placeholder.com/100';
   }
 }
 
@@ -82,8 +124,7 @@ class UserInfo extends StatefulWidget {
 
 class _UserInfoState extends State<UserInfo> {
   String username = 'Loading...';
-  String location = 'Loading...'; // Assuming you'll fetch this too
-  String website = 'Loading...'; // Assuming you'll fetch this too
+  String bio = 'Loading...';
 
   @override
   void initState() {
@@ -93,12 +134,9 @@ class _UserInfoState extends State<UserInfo> {
 
   Future<void> _getUserData() async {
     try {
-      // Get the current user's ID
       User? currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
-        String userId = currentUser.uid; // Get the user's UID
-
-        // Query Firestore collection for the user document
+        String userId = currentUser.uid;
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(userId)
@@ -106,33 +144,25 @@ class _UserInfoState extends State<UserInfo> {
 
         if (userDoc.exists) {
           setState(() {
-            username = userDoc['username'] ?? '@unknown'; // Get username
-            // name = userDoc['name'] ?? 'No Name'; // Get name
-            // location = userDoc['location'] ?? 'No Location'; // Get location
-            // website = userDoc['website'] ?? 'No Website'; // Get website
+            username = userDoc['username'] ?? '@unknown';
+            bio = userDoc['bio'] ?? 'No bio available';
           });
         } else {
           setState(() {
             username = 'No user found';
-            // name = 'No user found';
-            // location = 'No Location';
-            // website = 'No Website';
+            bio = 'No bio available';
           });
         }
       } else {
         setState(() {
           username = 'User not logged in';
-          // name = 'User not logged in';
-          // location = 'No Location';
-          // website = 'No Website';
+          bio = 'No bio available';
         });
       }
     } catch (e) {
       setState(() {
         username = 'Error loading username';
-        // name = 'Error loading name';
-        // location = 'No Location';
-        // website = 'No Website';
+        bio = 'Error loading bio';
       });
       print('Error fetching user data: $e');
     }
@@ -143,7 +173,8 @@ class _UserInfoState extends State<UserInfo> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start, // Align all text to the left
         children: [
           const SizedBox(height: 8),
           Text(
@@ -151,34 +182,16 @@ class _UserInfoState extends State<UserInfo> {
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.white, // White text for dark mode
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.location_on, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                location,
-                style: const TextStyle(
-                  color: Colors.grey, // Grey text for location
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.link, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                website,
-                style: const TextStyle(
-                  color: Color.fromRGBO(176, 101, 255, 1), // Blue for links
-                ),
-              ),
-            ],
+          Text(
+            bio,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
+            ),
           ),
         ],
       ),
