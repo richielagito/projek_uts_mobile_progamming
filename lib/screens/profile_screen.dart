@@ -80,6 +80,43 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+<<<<<<< HEAD
+=======
+                // Positioned profile image to overlap with the cover image and bio
+                Positioned(
+                  top: 100, // Adjust this value to move the avatar up or down
+                  left: 16, // Adjust for avatar's horizontal position
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: NetworkImage(
+                        'https://via.placeholder.com/100'), // Replace with actual profile image URL
+                  ),
+                ),
+                // Positioned Edit Profile button on the top-right corner
+                Positioned(
+                    top: 120, // Adjust for vertical positioning
+                    right: 16, // Adjust for horizontal positioning
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                            250, 176, 88, 238), // Button color
+                        padding: const EdgeInsets.all(20), // Increase hit area
+                      ),
+                      onPressed: () {
+                        print("Edit Profile button pressed");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileEditScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Edit Profile',
+                        style: TextStyle(color: Colors.white), // Text color
+                      ),
+                    )),
+>>>>>>> 6e42a07695503547e55a3360677953c42741c663
               ],
             ),
             const SizedBox(height: 60),

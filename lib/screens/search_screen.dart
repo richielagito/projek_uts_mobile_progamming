@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:projek_uts_mobile_progamming/screens/searchprofile_screen.dart'; // Pastikan untuk mengimpor SearchProfileScreen
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
@@ -13,7 +14,6 @@ class _SearchScreenState extends State<SearchScreen> {
   String searchQuery = "";
   List<String> filteredUsernames = [];
 
-  // Real-time search of usernames in Firestore
   Future<void> searchUsernames(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -23,23 +23,67 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     try {
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('username', isGreaterThanOrEqualTo: query)
-          .where('username',
-              isLessThanOrEqualTo:
-                  query + '\uf8ff') // for case-insensitive filtering
-          .get();
+      final querySnapshot =
+          await FirebaseFirestore.instance.collection('users').get();
 
-      final userNamesList =
+      final allUsernames =
           querySnapshot.docs.map((doc) => doc['username'].toString()).toList();
 
+      final lowerQuery = query.toLowerCase();
+      final List<String> exactMatches = [];
+      final List<String> startsWithMatches = [];
+      final List<String> containsMatches = [];
+
+      for (final username in allUsernames) {
+        final lowerUsername = username.toLowerCase();
+        if (lowerUsername == lowerQuery || username == query) {
+          exactMatches.add(username);
+        } else if (lowerUsername.startsWith(lowerQuery) ||
+            username.startsWith(query)) {
+          startsWithMatches.add(username);
+        } else if (lowerUsername.contains(lowerQuery) ||
+            username.contains(query)) {
+          containsMatches.add(username);
+        }
+      }
+
+      // Urutkan hasil berdasarkan prioritas
+      startsWithMatches.sort((a, b) {
+        final aLower = a.toLowerCase();
+        final bLower = b.toLowerCase();
+        if (aLower[0] != bLower[0]) {
+          return aLower.compareTo(bLower);
+        }
+        if (a.length > 1 && b.length > 1) {
+          if (a[1].toLowerCase() != b[1].toLowerCase()) {
+            return a[1].toLowerCase().compareTo(b[1].toLowerCase());
+          }
+          if (a[1] != b[1]) {
+            return a[1].compareTo(b[1]);
+          }
+        }
+        return a.compareTo(b);
+      });
+
       setState(() {
-        filteredUsernames = userNamesList;
+        filteredUsernames = [
+          ...exactMatches,
+          ...startsWithMatches,
+          ...containsMatches,
+        ];
       });
     } catch (e) {
       print("Error searching usernames: $e");
     }
+  }
+
+  void _navigateToSearchProfileScreen(String username) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchProfileScreen(username: username),
+      ),
+    );
   }
 
   @override
@@ -52,6 +96,7 @@ class _SearchScreenState extends State<SearchScreen> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
+            color: Colors.white,
           ),
         ),
         backgroundColor: Colors.black,
@@ -126,6 +171,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             filteredUsernames[index],
                             style: const TextStyle(color: Colors.white),
                           ),
+                          onTap: () => _navigateToSearchProfileScreen(
+                              filteredUsernames[index]),
                         );
                       },
                     )
