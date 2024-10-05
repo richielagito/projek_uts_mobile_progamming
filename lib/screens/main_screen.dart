@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projek_uts_mobile_progamming/screens/home_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/profile_screen.dart';
 import 'package:projek_uts_mobile_progamming/screens/search_screen.dart';
+import 'package:projek_uts_mobile_progamming/screens/searchprofile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key, Object? userData});
@@ -16,6 +17,9 @@ class MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const SearchScreen(),
     const ProfileScreen(),
+    const SearchProfileScreen(
+      username: '',
+    ),
   ];
 
   void onItemTapped(int index) {
