@@ -39,7 +39,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 // Positioned Edit Profile button on the top-right corner
                 Positioned(
-                    top: 1200, // Adjust for vertical positioning
+                    top: 120, // Adjust for vertical positioning
                     right: 16, // Adjust for horizontal positioning
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
