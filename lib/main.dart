@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:projek_uts_mobile_progamming/screens/login_screen.dart';
-import 'package:projek_uts_mobile_progamming/screens/main_screen.dart';
-import 'package:projek_uts_mobile_progamming/screens/post_thread_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-// Import the generated file
+import 'screens/login_screen.dart'; // Impor halaman login Anda
+import 'screens/profile_screen.dart';
+// Impor halaman-halaman lain yang Anda perlukan
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(const MyApp());
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -22,11 +17,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'GedaGedi.',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: LoginScreen());
+      title: 'Nama Aplikasi Anda',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      initialRoute: '/login', // Rute awal aplikasi
+      routes: {
+        '/login': (context) => LoginScreen(), // Definisikan rute login
+        '/profile': (context) => ProfileScreen(),
+        // Tambahkan rute-rute lain yang Anda perlukan
+      },
+    );
   }
 }

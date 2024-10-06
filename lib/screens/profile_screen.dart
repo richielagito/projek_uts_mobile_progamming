@@ -54,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () async {
-              await FirebaseAuth.instance.signOut();
+              await FirebaseAuth.instance.signOut(); // Logout functionality
               Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
