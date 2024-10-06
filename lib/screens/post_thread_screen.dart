@@ -9,7 +9,6 @@ class PostThreadScreen extends StatefulWidget {
   const PostThreadScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _PostThreadScreenState createState() => _PostThreadScreenState();
 }
 
@@ -87,26 +86,34 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
       body: Column(
         children: [
           Expanded(
-            child: TextField(
-              controller: _postController,
-              maxLines: null,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                hintText: 'What is happening?',
-                hintStyle: TextStyle(color: Colors.grey),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      controller: _postController,
+                      maxLines: null,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: 'What is happening?',
+                        hintStyle: TextStyle(color: Colors.grey),
+                        border: InputBorder.none,
+                      ),
+                      onChanged: (text) {
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                  if (_image != null)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.file(_image!, height: 200),
+                    ),
+                ],
               ),
-              onChanged: (text) {
-                setState(() {});
-              },
             ),
           ),
-          if (_image != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.file(_image!, height: 100),
-            ),
           Divider(height: 1, color: Colors.grey[800]),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -116,15 +123,7 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
                   icon: const Icon(Icons.image, color: Colors.blue),
                   onPressed: _getImage,
                 ),
-                const SizedBox(width: 16),
-                const Icon(Icons.gif_box, color: Colors.blue),
-                const SizedBox(width: 16),
-                const Icon(Icons.list_alt, color: Colors.blue),
-                const SizedBox(width: 16),
-                const Icon(Icons.location_on, color: Colors.blue),
-                const Spacer(),
-                const Text('Everyone can reply',
-                    style: TextStyle(color: Colors.grey)),
+                const Text('Add a Photo', style: TextStyle(color: Colors.grey)),
               ],
             ),
           ),
