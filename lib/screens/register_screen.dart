@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -15,6 +15,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final passwordController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
+  bool _isPasswordVisible = false; // Variabel untuk kontrol visibilitas password
 
   void daftar() async {
     showDialog(
@@ -23,6 +24,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: CircularProgressIndicator(),
       ),
     );
+
+    // Periksa apakah username sudah digunakan
+    if (await isUsernameUnique(usernameController.text)) {
+      Navigator.pop(context);
+      displayMessage("Username sudah digunakan, silakan pilih yang lain.");
+      return;
+    }
 
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -37,9 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (context.mounted) {
-        // ignore: use_build_context_synchronously
         Navigator.pop(context);
-        // ignore: use_build_context_synchronously
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const LoginScreen(),
@@ -47,7 +53,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // ignore: use_build_context_synchronously
       Navigator.pop(context);
       displayMessage(e.code);
     }
@@ -69,7 +74,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(message),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        backgroundColor: Colors.black,
+        title: Text(
+          message == "email-already-in-use"
+              ? "Email sudah digunakan, silakan gunakan email lain."
+              : message == "weak-password"
+                  ? "Password terlalu lemah."
+                  : message,
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              'OK',
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -87,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
+                  Container(
                     height: 60,
                     width: 180,
                     child: const Image(
@@ -161,13 +188,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Username',
                 ),
-                style: const TextStyle(
-                    color: Colors.white), // Warna teks input putih
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 15),
               // Input Password
               TextField(
                 controller: passwordController,
+                obscureText: !_isPasswordVisible, // Mengatur visibilitas password
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(11),
@@ -178,9 +205,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const BoxConstraints.tightFor(width: 327, height: 50),
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
                 ),
-                style: const TextStyle(
-                    color: Colors.white), // Warna teks input putih
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 15),
               // Input Phone
@@ -197,8 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Phone',
                 ),
-                style: const TextStyle(
-                    color: Colors.white), // Warna teks input putih
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 15),
               // Input Email
@@ -215,8 +253,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintStyle: const TextStyle(color: Colors.grey),
                   hintText: 'Email',
                 ),
-                style: const TextStyle(
-                    color: Colors.white), // Warna teks input putih
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 15),
               // Tombol Daftar
