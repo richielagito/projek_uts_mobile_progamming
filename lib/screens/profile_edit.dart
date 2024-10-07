@@ -250,7 +250,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Enter your bio',
-                  hintStyle: TextStyle(color: Colors.white54),
+                  hintStyle:
+                      TextStyle(color: Color.fromARGB(137, 226, 224, 224)),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.white),
                   ),
