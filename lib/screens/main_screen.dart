@@ -40,7 +40,7 @@ class MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined),
               label: ' ',
               backgroundColor: Colors.black),
           BottomNavigationBarItem(
