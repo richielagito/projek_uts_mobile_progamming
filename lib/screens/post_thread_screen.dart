@@ -69,7 +69,7 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _postController.text.isNotEmpty
-                    ? Colors.blue
+                    ? const Color.fromRGBO(176, 88, 238, 0.98)
                     : Colors.grey.withOpacity(0.5),
                 foregroundColor: _postController.text.isNotEmpty
                     ? Colors.white
@@ -122,7 +122,8 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.image, color: Colors.blue),
+                  icon: const Icon(Icons.image,
+                      color: Color.fromRGBO(176, 88, 238, 0.98)),
                   onPressed: _getImage,
                 ),
                 const Text('Add a Photo', style: TextStyle(color: Colors.grey)),
