@@ -5,9 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
+  // ignore: use_super_parameters
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -44,7 +46,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Setelah data didapatkan, arahkan ke MainScreen
         if (userData.exists) {
+          // ignore: use_build_context_synchronously
           Navigator.pop(context); // Tutup dialog CircularProgressIndicator
+          // ignore: use_build_context_synchronously
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => MainScreen(
@@ -53,11 +57,13 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else {
+          // ignore: use_build_context_synchronously
           Navigator.pop(context);
           displayMessage("User data not found!");
         }
       }
     } on FirebaseAuthException catch (e) {
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
       displayMessage(e.message ?? "An error occurred.");
     }
@@ -96,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
               flex: 4,
               child: Column(
                 children: [
-                  Container(
+                  SizedBox(
                       height: 60,
                       width: 180,
                       child: const Image(

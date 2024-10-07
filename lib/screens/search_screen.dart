@@ -73,6 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ];
       });
     } catch (e) {
+      // ignore: avoid_print
       print("Error searching usernames: $e");
     }
   }

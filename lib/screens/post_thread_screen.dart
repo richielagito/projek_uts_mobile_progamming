@@ -9,6 +9,7 @@ class PostThreadScreen extends StatefulWidget {
   const PostThreadScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PostThreadScreenState createState() => _PostThreadScreenState();
 }
 
@@ -53,6 +54,7 @@ class _PostThreadScreenState extends State<PostThreadScreen> {
                           user.uid,
                           _image,
                         );
+                        // ignore: use_build_context_synchronously
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                               builder: (context) => const MainScreen()),

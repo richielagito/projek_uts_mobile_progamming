@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -9,6 +10,7 @@ class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ProfileEditScreenState createState() => _ProfileEditScreenState();
 }
 
@@ -54,7 +56,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           });
         }
       } catch (e) {
-        print('Error loading user data: $e');
+        if (kDebugMode) {
+          print('Error loading user data: $e');
+        }
       }
     }
   }

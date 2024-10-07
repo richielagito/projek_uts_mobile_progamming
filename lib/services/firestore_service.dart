@@ -30,6 +30,7 @@ class FirestoreService {
       final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
       return downloadUrl;
     } catch (e) {
+      // ignore: avoid_print
       print('Error uploading image: $e');
       return null;
     }

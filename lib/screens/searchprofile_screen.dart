@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class SearchProfileScreen extends StatelessWidget {
   final String username;
 
+  // ignore: use_super_parameters
   const SearchProfileScreen({Key? key, required this.username})
       : super(key: key);
 
@@ -95,6 +96,7 @@ class SearchProfileScreen extends StatelessWidget {
         return userDoc['cover_photo'] ?? 'https://via.placeholder.com/500x150';
       }
     } catch (e) {
+      // ignore: avoid_print
       print('Error fetching cover image: $e');
     }
     return 'https://via.placeholder.com/500x150';
@@ -113,6 +115,7 @@ class SearchProfileScreen extends StatelessWidget {
         return userDoc['profile_picture'] ?? 'https://via.placeholder.com/100';
       }
     } catch (e) {
+      // ignore: avoid_print
       print('Error fetching profile image: $e');
     }
     return 'https://via.placeholder.com/100';
@@ -121,9 +124,11 @@ class SearchProfileScreen extends StatelessWidget {
 
 class UserInfo extends StatefulWidget {
   final String username;
+  // ignore: use_super_parameters
   const UserInfo({Key? key, required this.username}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _UserInfoState createState() => _UserInfoState();
 }
 
@@ -158,6 +163,7 @@ class _UserInfoState extends State<UserInfo> {
       setState(() {
         bio = 'Error loading bio';
       });
+      // ignore: avoid_print
       print('Error fetching user data: $e');
     }
   }

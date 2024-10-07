@@ -51,6 +51,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -164,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: const Text('Post'),
             onPressed: () async {
               await _handleComment(thread, commentContent);
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
           ),
@@ -507,6 +509,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       );
+                      // ignore: unnecessary_to_list_in_spreads
                     }).toList(),
                   ],
                 ),

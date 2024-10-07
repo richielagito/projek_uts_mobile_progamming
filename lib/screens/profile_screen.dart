@@ -7,6 +7,7 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
@@ -55,6 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () async {
               await FirebaseAuth.instance.signOut(); // Logout functionality
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
@@ -182,6 +184,7 @@ class UserInfo extends StatefulWidget {
   const UserInfo({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _UserInfoState createState() => _UserInfoState();
 }
 
@@ -225,6 +228,7 @@ class _UserInfoState extends State<UserInfo> {
         });
       }
     } catch (e) {
+      // ignore: avoid_print
       print('Error mengambil data pengguna: $e');
       setState(() {
         username = 'Gagal memuat username';
