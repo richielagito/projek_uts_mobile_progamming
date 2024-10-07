@@ -70,22 +70,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 FutureBuilder<String>(
                   future: _getCoverImage(),
                   builder: (context, snapshot) {
-                    return Container(
-                      height: 150,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: snapshot.connectionState ==
-                                  ConnectionState.waiting
-                              ? const NetworkImage(
-                                  'https://via.placeholder.com/500x150')
-                              : snapshot.hasData && snapshot.data != null
-                                  ? NetworkImage(snapshot.data!)
-                                  : const NetworkImage(
-                                      'https://via.placeholder.com/500x150'),
-                          fit: BoxFit.cover,
+                    if (snapshot.connectionState == ConnectionState.waiting ||
+                        !snapshot.hasData ||
+                        snapshot.data == null) {
+                      // Show a solid color while loading or if no image exists
+                      return Container(
+                        height: 150,
+                        color: const Color.fromARGB(
+                            255, 243, 237, 244), // Placeholder color
+                      );
+                    } else {
+                      return Container(
+                        height: 150,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(snapshot.data!),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
                 ),
                 Positioned(
@@ -94,17 +98,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: FutureBuilder<String>(
                     future: _getProfileImage(),
                     builder: (context, snapshot) {
-                      return CircleAvatar(
-                        radius: 40,
-                        backgroundImage:
-                            snapshot.connectionState == ConnectionState.waiting
-                                ? const NetworkImage(
-                                    'https://via.placeholder.com/100')
-                                : snapshot.hasData && snapshot.data != null
-                                    ? NetworkImage(snapshot.data!)
-                                    : const NetworkImage(
-                                        'https://via.placeholder.com/100'),
-                      );
+                      if (snapshot.connectionState == ConnectionState.waiting ||
+                          !snapshot.hasData ||
+                          snapshot.data == null) {
+                        // Show a solid color with an icon while loading or if no image exists
+                        return CircleAvatar(
+                          radius: 40,
+                          backgroundColor: const Color.fromARGB(
+                              255, 189, 194, 198), // Placeholder color
+                          child: const Icon(
+                            Icons.person, // Optional icon as a placeholder
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        );
+                      } else {
+                        return CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(snapshot.data!),
+                        );
+                      }
                     },
                   ),
                 ),
@@ -113,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   right: 16,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(176, 88, 238, 0.98),
+                      backgroundColor: const Color.fromARGB(255, 195, 112, 255),
                       padding: const EdgeInsets.all(20),
                     ),
                     onPressed: () {
@@ -147,9 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .collection('users')
           .doc(currentUser.uid)
           .get();
-      return userDoc['cover_photo'] ?? 'https://via.placeholder.com/500x150';
+      return userDoc['cover_photo'] ?? '';
     }
-    return 'https://via.placeholder.com/500x150';
+    return '';
   }
 
   Future<String> _getProfileImage() async {
@@ -159,9 +172,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .collection('users')
           .doc(currentUser.uid)
           .get();
-      return userDoc['profile_picture'] ?? 'https://via.placeholder.com/100';
+      return userDoc['profile_picture'] ?? '';
     }
-    return 'https://via.placeholder.com/100';
+    return '';
   }
 }
 

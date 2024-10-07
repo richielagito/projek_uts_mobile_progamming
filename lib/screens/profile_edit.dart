@@ -46,10 +46,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           setState(() {
             profilePictureUrl =
                 (userDoc.data() as Map<String, dynamic>)['profile_picture'] ??
-                    'https://via.placeholder.com/100'; // Default profile image
-            coverPhotoUrl = (userDoc.data()
-                    as Map<String, dynamic>)['cover_photo'] ??
-                'https://via.placeholder.com/500x150'; // Default cover image
+                    '';
+            coverPhotoUrl =
+                (userDoc.data() as Map<String, dynamic>)['cover_photo'] ?? '';
             _usernameController.text = userDoc['username'] ?? '';
             _bioController.text = userDoc['bio'] ?? '';
           });
@@ -150,8 +149,22 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(
+            color: Colors.white, // Set title color to white
+          ),
+        ),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Set back icon color to white
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
+      backgroundColor: Colors.black, // Set background color to black
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -164,17 +177,26 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 child: Container(
                   height: 150,
                   decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(coverPhotoUrl),
-                      fit: BoxFit.cover,
-                    ),
+                    color: coverPhotoUrl.isEmpty
+                        ? const Color.fromARGB(
+                            255, 255, 253, 253) // Placeholder color
+                        : null,
+                    image: coverPhotoUrl.isNotEmpty
+                        ? DecorationImage(
+                            image: NetworkImage(coverPhotoUrl),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
-                  child: const Center(
-                    child: Text(
-                      'Tap to change cover photo',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                  child: coverPhotoUrl.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'Tap to change cover photo',
+                            style:
+                                TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                          ),
+                        )
+                      : null,
                 ),
               ),
               const SizedBox(height: 16),
@@ -183,26 +205,59 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 onTap: uploadProfilePicture,
                 child: CircleAvatar(
                   radius: 50,
+                  backgroundColor: profilePictureUrl.isEmpty
+                      ? const Color.fromARGB(
+                          255, 195, 112, 255) // Placeholder color
+                      : null,
                   backgroundImage: profilePictureUrl.isNotEmpty
                       ? NetworkImage(profilePictureUrl)
                       : null,
                   child: profilePictureUrl.isEmpty
-                      ? const Icon(Icons.camera_alt, size: 50)
+                      ? const Icon(
+                          Icons.camera_alt,
+                          size: 50,
+                          color: Colors.white, // Icon color for placeholder
+                        )
                       : null,
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('Username', style: TextStyle(fontSize: 18)),
+              const Text(
+                'Username',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
               TextField(
                 controller: _usernameController,
-                decoration:
-                    const InputDecoration(hintText: 'Enter your username'),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Enter your username',
+                  hintStyle: TextStyle(color: Colors.white54),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
-              const Text('Bio', style: TextStyle(fontSize: 18)),
+              const Text(
+                'Bio',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
               TextField(
                 controller: _bioController,
-                decoration: const InputDecoration(hintText: 'Enter your bio'),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Enter your bio',
+                  hintStyle: TextStyle(color: Colors.white54),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
@@ -220,6 +275,15 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                   }
                   Navigator.pop(context);
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(
+                    255,
+                    195,
+                    112,
+                    255,
+                  ),
+                  foregroundColor: Colors.white, // Button text color
+                ),
                 child: const Text('Save'),
               ),
             ],
