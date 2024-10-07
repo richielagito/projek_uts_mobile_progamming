@@ -129,7 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 width: 327,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: const Color.fromARGB(255, 195, 112, 255),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Row(
@@ -263,7 +263,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   width: 327,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: const Color.fromARGB(255, 195, 112, 255),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: const Center(

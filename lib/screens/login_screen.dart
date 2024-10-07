@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 330,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: const Color.fromARGB(255, 195, 112, 255),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: const Center(
@@ -212,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 child: const Text(
                   'Lupa kata sandi?',
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
               const SizedBox(height: 20), // Jarak vertikal lagi
@@ -228,14 +228,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 330,
                   height: 40,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue),
+                    border: Border.all(color: const Color.fromARGB(255, 195, 112, 255),),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: const Center(
                     child: Text(
                       'Buat akun baru',
                       style: TextStyle(
-                          color: Colors.blue, fontWeight: FontWeight.bold),
+                          color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

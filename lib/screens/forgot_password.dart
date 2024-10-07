@@ -133,9 +133,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: isCodeSent ? resetPassword : sendResetCode,
-                child: Text(isCodeSent ? 'Reset Password' : 'Kirim Kode'),
+                child: Text(
+                  isCodeSent ? 'Reset Password' : 'Kirim Kode',
+                  style: TextStyle(color: Colors.white), // Ubah warna teks menjadi putih
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: const Color.fromARGB(255, 195, 112, 255),
                   fixedSize: const Size(330, 40),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
